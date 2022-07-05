@@ -1,0 +1,225 @@
+<button class="btn" onclick="start()">Start</button>
+<h2 id="timer">0:00</h2>
+<div class="container">
+    <div class="grid-9">
+      <div id="js-boggle" class="boggle"></div>
+      
+      <input type="text" id="js-word" class="enter-word" />
+      <input type="button" id="js-enter-word" class="btn" value=" Enter " />
+    </div>
+    <div class="grid-3">
+      <div> Words / Score: <span id="score">0</span></div>
+      <div class="words-found" id="words-found"></div>
+    </div>
+  </div>
+
+<style>
+input[type="button"], .btn {
+  cursor: pointer;
+  font-family: inherit;
+}
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  min-width: 400px;
+  padding: 1em;
+  text-align: center;
+}
+.container [class*="grid-"] {
+  float: left;
+}
+.container .grid-1 {
+  width: 8.333%;
+}
+.container .grid-2 {
+  width: 16.666%;
+}
+.container .grid-3 {
+  width: 24.999%;
+}
+.container .grid-4 {
+  width: 33.332%;
+}
+.container .grid-5 {
+  width: 41.665%;
+}
+.container .grid-6 {
+  width: 49.998%;
+}
+.container .grid-7 {
+  width: 58.331%;
+}
+.container .grid-8 {
+  width: 66.664%;
+}
+.container .grid-9 {
+  width: 74.997%;
+}
+.container .grid-10 {
+  width: 83.33%;
+}
+.container .grid-11 {
+  width: 91.663%;
+}
+.container .grid-12 {
+  width: 99.996%;
+}
+.boggle {
+  padding: 0 0 1em 0;
+}
+
+.boggle span {
+  display: inline-block;
+  max-width: 120px;
+  min-width: 1em;
+  padding: 2em;
+  margin: 0.1em;
+  background-color: #0ebeff;
+  border: 1px #fff solid;
+  border-radius: 10px;
+  color: #fff;
+}
+.enter-word, .btn {
+  padding: 0.5em;
+}
+.btn {
+  background-color: #0ebeff;
+  border: 0.1em solid #0ebeff;
+  color: #fff;
+}
+
+</style>
+<script>
+let guessed_words = [];
+function loadBoard(letters, size) {
+    var board = document.getElementById('js-boggle')
+    let boardText = ""
+    letters.board.forEach(function(row) {
+        boardText += "<div class='row'>"
+        row.forEach(function(letter) {
+            boardText += "<span><strong>" + letter + "</strong></span>"
+        })
+        boardText += "</div>"
+    })
+    board.innerHTML = boardText
+}
+
+function getScore(wordLen, boardSize) {
+    console.log(boardSize)
+    if (boardSize < 6) {
+        if (wordLen == 3) {
+            return 1
+        } else if (wordLen == 4) {
+            return 2
+        } else if (wordLen == 5) {
+            return 3
+        } else if (wordLen == 6) {
+            return 4
+        } else if (wordLen == 6) {
+            return 5
+        } else if (wordLen == 7) {
+            return 6
+        } else if (wordLen == 8) {
+            return 12
+        } else if (wordLen > 8) {
+            return 2*wordLen
+        }
+    } 
+    else if (boardSize>=6) {
+        if (wordLen == 3) {
+            return 0
+        } else if (wordLen == 4) {
+            return 1
+        } else if (wordLen == 5) {
+            return 2
+        } else if (wordLen == 6) {
+            return 3
+        } else if (wordLen == 6) {
+            return 3
+        } else if (wordLen == 7) {
+            return 5
+        } else if (wordLen == 8) {
+            return 11
+        } else if (wordLen > 8) {
+            return 2*wordLen
+        }
+    }
+}
+
+// initiate websocket connection
+const socket = new WebSocket('ws://localhost:8080');
+
+socket.onopen = function(e) {
+    console.log("connection established")
+    socket.send(JSON.stringify({
+        "type": "join",
+        "room": "{{room}}",
+    }))
+};
+
+socket.onmessage = function(event) {
+    let data = JSON.parse(event.data)
+    //console.log(data)
+    if (data.type === "start") {
+        document.getElementById('words-found').innerHTML = ""
+        document.getElementById('score').innerHTML = "0"
+        startTimer(data.timer, document.getElementById('timer'))
+        loadBoard(data.board, data.size)
+    }
+    if (data.type === "guess") {
+        if (data.correct === true) {
+            if (!guessed_words.includes(data.word)) {
+                guessed_words.push(data.word)
+                let score = getScore(data.word.length, data.boardSize)
+                document.getElementById('score').innerHTML = parseInt(document.getElementById('score').innerHTML) + score
+                document.getElementById('words-found').innerHTML = document.getElementById('words-found').innerHTML + data.word + "<br>"
+            }
+        } else {
+            console.log("not a word")
+        }
+    }
+    if (data.type === "end") {
+        console.log('time is up')
+        document.getElementById('js-boggle').innerHTML = "Time is up!"
+        //alert("time is up!")
+    }
+};
+
+function start() {
+    socket.send(JSON.stringify({
+        "type": "start",
+        "room": "{{room}}",
+    }))
+}
+
+function startTimer(duration, display) {
+    var timer = duration, minutes, seconds;
+    setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            timer = duration;
+        }
+    }, 1000);
+}
+
+
+// event listener for enter key
+document.addEventListener('keydown', function(e) {
+  if(e.keyCode === 13) {
+    socket.send(JSON.stringify({
+        "type": "guess",
+        "word": document.getElementById('js-word').value,
+        "room": "{{room}}",
+    }))
+    document.getElementById('js-word').value = ""
+  }
+});
+
+</script>

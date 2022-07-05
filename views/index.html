@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>boggle</title>
+</head>
+<body>
+    <div class="center">
+        <h2>Create room</h2>
+        <form action="create-room" method="get">
+            <input type="text" name="size" placeholder="board size (eg. 6)"><br>
+            <input type="text" name="time" placeholder="time in secs (eg. 120)"><br>
+            <input type="submit" value="Create room">
+        </form>
+        <br><br><strong>OR</strong><br><br>
+        <h2>Join room</h2>
+        <form action="room" method="get">
+            <input type="text" name="room" placeholder="4-digit room code"><br>
+            <input type="submit" value="Join room">
+        </form>
+    </div>
+</body>
+</html>
+<style>
+html, body {
+  font-family: "Open Sans";
+  font-weight: 600 !important;
+}
+
+span {
+  display: inline-block;
+  max-width: 120px;
+  min-width: 1em;
+  padding: 2em;
+  margin: 0.1em;
+  background-color: #0ebeff;
+  border: 1px #fff solid;
+  border-radius: 10px;
+  color: #fff;
+}
+input[type=submit]{
+  background-color: #0ebeff;
+  border: 0.1em solid #0ebeff;
+  color: #fff;
+  padding: 0.5em;
+} 
+* {
+    margin-bottom: .5em;
+}
+.center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+</style>

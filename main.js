@@ -1,12 +1,14 @@
 const express = require('express')
 const WebSocketServer = require('ws').Server
 const app = express()
-const port = 3000
 const nunjucks = require('nunjucks')
 const Boggle = require('solve-boggle')
 
+const webPort = 8080
+const wsPort = 8081
+
 let rooms = {}
-const wss = new WebSocketServer({ port: 8080 })
+const wss = new WebSocketServer({ port: wsPort })
 
 function createRoom(size, time) {
     // generate random string
@@ -165,6 +167,7 @@ wss.on('connection', function connection(ws) {
   
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+    console.log(`webserver on port ${webPort}`)
+    console.log(`ws on port ${wsPort}`)
 })
 

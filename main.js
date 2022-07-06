@@ -166,7 +166,7 @@ wss.on('connection', function connection(ws) {
 })
   
 
-app.listen(port, () => {
+app.listen(webPort, () => {
     console.log(`webserver on port ${webPort}`)
     console.log(`ws on port ${wsPort}`)
 })

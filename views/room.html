@@ -147,7 +147,7 @@ function getScore(wordLen, boardSize) {
 }
 
 // initiate websocket connection
-const socket = new WebSocket('ws://localhost:8080');
+const socket = new WebSocket('ws://localhost:8081');
 
 socket.onopen = function(e) {
     console.log("connection established")
